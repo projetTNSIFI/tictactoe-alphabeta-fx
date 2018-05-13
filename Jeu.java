@@ -1,21 +1,34 @@
 package com;
-import java.util.Scanner;
 
 import com.Plateau;
-
 import base.Joueur;
+import javafx.application.Platform;
+import javafx.stage.Stage;
 
-public final class Jeu {
+public class Jeu implements Runnable{
+	
 	public static final int O=-1;
 	public static final int X=1;
-	public static Scanner scanner = new Scanner(System.in);
-	public static void run(Plateau plateau)
+	public static int joueur = O;
+	
+	//public static Scanner scanner = new Scanner(System.in);
+	protected Stage rootStage;
+	protected Plateau plateau;
+	
+	public Jeu(Stage stage, Plateau plateau)
 	{
-		int victoire = 0, joueur = Jeu.O;
+		this.rootStage = stage;
+		this.plateau = plateau;
+	}
+	
+	@Override
+	public void run()
+	{
+		int victoire = 0;
 		
 		//Création de deux joueurs 
 		Joueur humain = new Humain("Joueur",O);
-		Joueur ordinateur = new Ordinateur("Ordinateur",X,3);
+		Joueur ordinateur = new Ordinateur("Ordinateur",X,2);
 		
 		//Jeu
 		while(!plateau.complet())
@@ -23,17 +36,35 @@ public final class Jeu {
 			
 			//Tour du joueur
 			if(joueur == Jeu.O)
-				humain.jouer(plateau);
+				humain.jouer(rootStage, plateau);
 			else
-				ordinateur.jouer(plateau);
+				ordinateur.jouer(rootStage, plateau);
 			
+			//Affichage du plateau après chaque tour de jeu.
+			//plateau.afficherConsole();
+			
+			//Mise à jour du composant graphique dans l'affichage. Besoin d'utiliser un nouveau thread pour les elements graphiques.
+			Platform.runLater(new Runnable()
+					{
+						@Override 
+						public void run()
+						{
+							plateau.afficher(rootStage);
+							Thread.currentThread().interrupt();
+						}
+					});
+		
 			//Vérification de la victoire
 			victoire = plateau.victoire();
 			if(victoire != 0)
 				break;
-			
-			//Changement de tour
-			joueur *= -1;
+		
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		if(victoire != 0)
@@ -41,7 +72,14 @@ public final class Jeu {
 		else
 			System.out.println("Match nul");
 		
+		Thread.currentThread().interrupt();
 		//Fermeture du scanner.
-		scanner.close();
+		//scanner.close();
 	}
+	
+	public static void changerJoueur()
+	{
+		joueur *= -1;
+	}
+
 }

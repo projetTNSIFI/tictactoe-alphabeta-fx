@@ -1,6 +1,7 @@
 package com;
 
 import base.Joueur;
+import javafx.stage.Stage;
 
 public class Ordinateur extends Joueur{
 	
@@ -13,7 +14,7 @@ public class Ordinateur extends Joueur{
 		this.profondeur = profondeur;
 	}
 	
-	public void jouer(Plateau plateau)
+	public void jouer(Stage rootStage, Plateau plateau)
 	{
 		System.out.println("Tour du joueur " + nom);
 		
@@ -37,7 +38,9 @@ public class Ordinateur extends Joueur{
 		prochain_coup = racine.filsMax();
 		plateau.setPlateau(prochain_coup.plateau);
 		
-		plateau.Afficher();
+		System.out.println("Coup joué : ");
+		plateau.afficherConsole();
+		Jeu.changerJoueur();
 	}
 	
 	public void setProfondeur(int profondeur)

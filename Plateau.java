@@ -1,6 +1,11 @@
 package com;
 
 import java.util.Arrays;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class Plateau {
 	protected int matrix[][];
@@ -42,8 +47,100 @@ public class Plateau {
 	}
 	
 	//TOKEN = -1 : O ; TOKEN = 1 : X
-	public void Afficher()
+	public void afficher(Stage rootStage)
 	{
+		
+		//Récupération du root de la scene
+		Scene scene = rootStage.getScene();
+		Group group = (Group) scene.getRoot();
+		GridPane grid = (GridPane)group.getChildren().get(0);
+		
+		//Ajout d'un bouton pour chaque case dans le groupe.
+		if(grid.getChildren().isEmpty())
+		{
+			//On ajoute les boutons au groupe
+			for(int i = 0; i < matrix.length;i++)
+			{
+				for(int j = 0; j < matrix[i].length;j++)
+				{
+					Bouton btn;
+					switch(matrix[j][i])
+					{
+					case 0:
+						btn = new Bouton("-",i,j);
+						break;
+					case Jeu.X:
+						btn = new Bouton("X",i,j);
+						break;
+					case Jeu.O:
+						btn = new Bouton("O",i,j);
+						break;
+					default :
+						btn = new Bouton("-",i,j);
+						break;
+					}
+					
+					//Positionnement des boutons
+					//btn.setLayoutX(100 * i);
+					//btn.setLayoutY(100 * j);
+					btn.setPadding(new Insets(90));
+					//Ajout du bouton au groupe.
+					grid.add(btn,i,j);
+				}
+			}
+		}
+		//Si le groupe contient déjà des boutons, on met à jour leur contenu.
+		else
+		{
+			/*
+			for(int i = 0;i < matrix.length;i++)
+			{
+				for(int j = 0; j < matrix[i].length;j++)
+				{
+					Bouton btn = (Bouton) grid.getChildren().get(j + 3 * i);
+					switch(matrix[j][i])
+					{
+					case 0:
+						btn.setText("-");
+						break;
+					case Jeu.X:
+						btn.setText("X");
+						break;
+					case Jeu.O:
+						btn.setText("O");
+						break;
+					default :
+						btn.setText("-");
+						break;
+					}
+				}
+			}*/
+			
+			for(int i = 0;i < grid.getChildren().size();i++)
+			{
+				Bouton bouton = (Bouton) grid.getChildren().get(i);
+				switch(matrix[bouton.j][bouton.i])
+				{
+				case 0:
+					bouton.setText("-");
+					break;
+				case Jeu.X:
+					bouton.setText("X");
+					break;
+				case Jeu.O:
+					bouton.setText("O");
+					break;
+				default :
+					bouton.setText("-");
+					break;
+				}
+			}
+		}
+	}
+	
+	public void afficherConsole()
+	{
+		
 		for(int i  = 0;i < matrix.length;i++)
 		{
 			for(int j = 0;j < matrix[i].length;j++)

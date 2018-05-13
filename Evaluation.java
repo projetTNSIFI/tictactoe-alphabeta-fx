@@ -30,7 +30,7 @@ public class Evaluation {
 	public static void evaluer_noeuds(Noeud courant, int profondeur)
 	{
 		if(profondeur <= 0)
-			courant.valeur_noeud = 0;
+			courant.valeur_noeud = danger(courant);
 		
 		//On attribue une valeur aux noeuds feuilles
 		if(courant.estFeuille())
@@ -39,9 +39,9 @@ public class Evaluation {
 			if(courant.plateau.victoire() == Jeu.X)
 				courant.valeur_noeud = 1000;
 			else if(courant.plateau.victoire() == Jeu.O)
-				courant.valeur_noeud = -1000;
+				courant.valeur_noeud = -1000 + danger(courant);
 			else 
-				courant.valeur_noeud = 0;			
+				courant.valeur_noeud = danger(courant);			
 		}
 		else
 		{
@@ -70,8 +70,77 @@ public class Evaluation {
 	{
 		for(Noeud f : courant.fils)
 		{
-			f.plateau.Afficher();
+			f.plateau.afficherConsole();
 			System.out.println("Score du noeud : " + f.valeur_noeud);
 		}
+	}
+	
+	//Renvoie une valeur de danger pour un noeud.
+	protected static int danger(Noeud courant)
+	{
+		int danger = 0;
+		
+		int[][] matrix = courant.plateau.getPlateau();
+		int nombre_ligne_X = 0;
+		int nombre_vide_ligne = 0;
+		int nombre_colonne_X = 0;
+		int nombre_vide_colonne = 0;
+		int nombre_dd_X = 0;
+		int nombre_dg_X = 0;
+		int nombre_vide_dd = 0;
+		int nombre_vide_dg = 0;
+		
+		for(int i = 0 ;i < matrix.length;i++)
+		{
+			for(int j = 0;j < matrix[i].length;j++)
+			{
+				if(matrix[j][i] == Jeu.O)
+					nombre_ligne_X++;
+				else if(matrix[j][i] == 0)
+					nombre_vide_ligne++;
+				if(matrix[i][j] == Jeu.O)
+					nombre_colonne_X++;
+				else if(matrix[i][j] == 0)
+					nombre_vide_colonne++;
+			}
+			
+			if(nombre_ligne_X == 2 && nombre_vide_ligne == 1)
+				danger -= 250;//Plus la valeur est basse, plus c'est dangereux.
+			if(nombre_colonne_X == 2 && nombre_vide_colonne == 1)
+				danger -= 250;
+			
+			//On vérifie si l
+			nombre_ligne_X = 0;
+			nombre_colonne_X = 0;
+			nombre_vide_ligne = 0;
+			nombre_vide_colonne = 0;
+			
+		}
+		
+		//diagonales
+		int j = 0;
+		for(int i = 0;i < matrix.length;i++)
+		{
+			if(matrix[j][i] == Jeu.O)
+				nombre_dg_X++;
+			else if(matrix[j][i] == 0)
+				nombre_vide_dg++;
+			j++;
+		} 
+		if(nombre_dg_X == 2 && nombre_vide_dg==0)
+			danger-=250;
+		j=2;
+		for(int i = 0;i < matrix.length;i++)
+		{
+			if(matrix[j][i] == Jeu.O)
+				nombre_dd_X++;
+			else if(matrix[j][i] == 0)
+				nombre_vide_dd++;
+			j--;
+		} 
+		if(nombre_dd_X == 2 && nombre_vide_dd==0)
+			danger-=250;
+		
+		return danger;
 	}
 }
